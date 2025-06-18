@@ -71,7 +71,7 @@ if (UNIX AND NOT APPLE)
     set(ads_HEADERS linux/FloatingWidgetTitleBar.h ${ads_HEADERS})
 endif()
 
-set(library_name "qtadvanceddocking-qt${QT_VERSION_MAJOR}")
+set(library_name "Qt-Advanced-Docking-System")
 if(BUILD_STATIC)
     add_library(${library_name} STATIC ${ads_SRCS} ${ads_HEADERS})
     target_compile_definitions( ${library_name} PUBLIC ADS_STATIC)
@@ -100,9 +100,9 @@ set_target_properties(${library_name} PROPERTIES
     VERSION ${VERSION_SHORT}
     EXPORT_NAME ${library_name}
     DEBUG_POSTFIX "d"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${ads_PlatformDir}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${ads_PlatformDir}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${ads_PlatformDir}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 if(QT_VERSION_MAJOR STREQUAL "5")
     set_target_properties(${library_name} PROPERTIES
