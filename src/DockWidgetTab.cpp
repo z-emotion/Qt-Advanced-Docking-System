@@ -161,9 +161,9 @@ struct DockWidgetTabPrivate
 	}
 
 	template <typename T>
-	IFloatingWidget* createFloatingWidget(T* Widget, bool CreateContainer)
+	IFloatingWidget* createFloatingWidget(T* Widget, bool OpaqueUndocking)
 	{
-		if (CreateContainer)
+		if (OpaqueUndocking)
 		{
 			return new CFloatingDockContainer(Widget);
 		}
@@ -318,7 +318,8 @@ bool DockWidgetTabPrivate::startFloating(eDragState DraggingState)
     ADS_PRINT("startFloating");
 	DragState = DraggingState;
 	IFloatingWidget* FloatingWidget = nullptr;
-	bool CreateContainer = (DraggingFloatingWidget != DraggingState);
+	bool OpaqueUndocking = CDockManager::testConfigFlag(CDockManager::OpaqueUndocking) ||
+		(DraggingFloatingWidget != DraggingState);
 
 	// If section widget has multiple tabs, we take only one tab
 	// If it has only one single tab, we can move the complete
@@ -326,12 +327,12 @@ bool DockWidgetTabPrivate::startFloating(eDragState DraggingState)
 	QSize Size;
 	if (DockArea->dockWidgetsCount() > 1)
 	{
-		FloatingWidget = createFloatingWidget(DockWidget, CreateContainer);
+		FloatingWidget = createFloatingWidget(DockWidget, OpaqueUndocking);
 		Size = DockWidget->size();
 	}
 	else
 	{
-		FloatingWidget = createFloatingWidget(DockArea, CreateContainer);
+		FloatingWidget = createFloatingWidget(DockArea, OpaqueUndocking);
 		Size = DockArea->size();
 	}
 
@@ -398,6 +399,10 @@ void CDockWidgetTab::mouseReleaseEvent(QMouseEvent* ev)
 {
 	if (ev->button() == Qt::LeftButton)
 	{
+		if (CDockManager::testConfigFlag(CDockManager::OpaqueUndocking))
+		{
+			releaseMouse();
+		}
 		auto CurrentDragState = d->DragState;
 		d->GlobalDragStartMousePosition = QPoint();
 		d->DragStartMousePosition = QPoint();
@@ -489,17 +494,23 @@ void CDockWidgetTab::mouseMoveEvent(QMouseEvent* ev)
 
 
     	// Floating is only allowed for widgets that are floatable
-		// We can create the drag preview if the widget is movable.
+		// If we do non opaque undocking, then can create the drag preview
+		// if the widget is movable.
 		auto Features = d->DockWidget->features();
-        if (Features.testFlag(CDockWidget::DockWidgetFloatable) || (Features.testFlag(CDockWidget::DockWidgetMovable)))
+        if (Features.testFlag(CDockWidget::DockWidgetFloatable)
+        || (Features.testFlag(CDockWidget::DockWidgetMovable) && !CDockManager::testConfigFlag(CDockManager::OpaqueUndocking)))
         {
         	// If we undock, we need to restore the initial position of this
         	// tab because it looks strange if it remains on its dragged position
-        	if (d->isDraggingState(DraggingTab))
+        	if (d->isDraggingState(DraggingTab) && !CDockManager::testConfigFlag(CDockManager::OpaqueUndocking))
 			{
         		parentWidget()->layout()->update();
 			}
             d->startFloating();
+            if (CDockManager::testConfigFlag(CDockManager::OpaqueUndocking))
+            {
+            	grabMouse();
+            }
         }
     	return;
 	}

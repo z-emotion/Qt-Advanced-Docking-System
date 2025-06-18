@@ -561,7 +561,13 @@ void MainWindowPrivate::createContent()
 
 #ifdef Q_OS_WIN
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    DockManager->addDockWidget(ads::CenterDockWidgetArea, createActiveXWidget(), RighDockArea);
+    // If opaque undocking is active, then undocking of widgets while
+    // active x widget is visible causes jerking while dragging a floating
+    // widget
+    if (!ads::CDockManager::testConfigFlag(ads::CDockManager::OpaqueUndocking))
+    {
+    	DockManager->addDockWidget(ads::CenterDockWidgetArea, createActiveXWidget(), RighDockArea);
+    }
 #endif
 #endif
 
