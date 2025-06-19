@@ -1464,6 +1464,13 @@ QSize CDockAreaWidget::minimumSizeHint() const
 
 
 //============================================================================
+void CDockAreaWidget::updateMinimumSizeHint()
+{
+    d->updateMinimumSizeHint();
+}
+
+
+//============================================================================
 void CDockAreaWidget::onDockWidgetFeaturesChanged()
 {
 	if (d->TitleBar)

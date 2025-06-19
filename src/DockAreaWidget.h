@@ -241,6 +241,11 @@ public:
     virtual QSize minimumSizeHint() const override;
 
 	/**
+     * Update the minimumSizeHint of DockAreaWidgetPrivate
+     */
+	void updateMinimumSizeHint();
+
+	/**
 	 * Returns the rectangle of the title area
 	 */
 	QRect titleBarGeometry() const;
