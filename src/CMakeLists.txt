@@ -88,6 +88,17 @@ endif()
 
 add_library(ads::${library_name} ALIAS ${library_name})
 
+if(MSVC)
+    # Generate a .pdb file for crash reporting in RELEASE build.
+    target_compile_options(${library_name} PRIVATE $<$<CONFIG:RELEASE>:/Zi>)
+
+    # /OPT:REF and /OPT:ICF are re-enabled explicitly because /DEBUG turns them off by default.
+    target_link_options(${library_name} PRIVATE $<$<CONFIG:RELEASE>:/DEBUG> $<$<CONFIG:RELEASE>:/OPT:REF> $<$<CONFIG:RELEASE>:/OPT:ICF>)
+elseif(APPLE)
+    # Keep debug info so that dsymutil can generate a .dSYM file for crash reporting in RELEASE build.
+    target_compile_options(${library_name} PRIVATE $<$<CONFIG:RELEASE>:-g>)
+endif()
+
 target_link_libraries(${library_name} PUBLIC Qt${QT_VERSION_MAJOR}::Core 
                                                Qt${QT_VERSION_MAJOR}::Gui 
                                                Qt${QT_VERSION_MAJOR}::Widgets)
